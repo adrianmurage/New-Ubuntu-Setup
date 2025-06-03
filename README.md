@@ -55,6 +55,29 @@ chmod +x fresh-install.sh && ./fresh-install.sh
 wget -qO- https://raw.githubusercontent.com/adrianmurage/New-Ubuntu-Setup/refs/heads/main/fresh-install.sh | bash
 ```
 
+## ↩️ Easy Revert (Undo All Changes)
+
+Don't like the setup? No problem! You can safely revert everything:
+
+```bash
+# Revert all changes back to original state
+curl -fsSL https://raw.githubusercontent.com/adrianmurage/New-Ubuntu-Setup/refs/heads/main/fresh-install.sh | bash -s -- --revert
+```
+
+### What Gets Reverted
+- **Keyboard shortcut** - Ctrl+Alt+T opens default terminal again
+- **Bash prompt** - Removes Git branch info, restores original prompt
+- **Terminal shortcuts** - Removes enhanced word navigation and editing
+- **Terminator config** - Restores original settings or removes custom config
+- **All backups used** - Your original files are restored from automatic backups
+
+### After Revert
+- **Terminator stays installed** - But no longer configured or bound to Ctrl+Alt+T
+- **Complete removal**: Run `sudo apt remove terminator` if you want to uninstall completely
+- **Original experience** - Everything exactly as it was before running the script
+
+**The revert is completely safe** and uses the same backup system that protects your files during installation!
+
 ## 🛠️ Installation Steps
 
 1. **Open default terminal** (Ctrl+Alt+T)
@@ -143,6 +166,16 @@ ping -c 3 google.com
 
 # Try running with explicit bash
 bash <(curl -fsSL https://raw.githubusercontent.com/adrianmurage/New-Ubuntu-Setup/refs/heads/main/fresh-install.sh)
+```
+
+### Don't Like the Setup?
+```bash
+# Revert everything back to original state
+curl -fsSL https://raw.githubusercontent.com/adrianmurage/New-Ubuntu-Setup/refs/heads/main/fresh-install.sh | bash -s -- --revert
+
+# Or download and run revert
+curl -fsSL https://raw.githubusercontent.com/adrianmurage/New-Ubuntu-Setup/refs/heads/main/fresh-install.sh -o fresh-install.sh
+chmod +x fresh-install.sh && ./fresh-install.sh --revert
 ```
 
 ### Shortcut Not Working
