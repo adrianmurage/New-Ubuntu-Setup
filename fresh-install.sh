@@ -157,6 +157,81 @@ export PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\[\033
 EOF
 
 echo "✅ Git-aware prompt configured in ~/.bashrc"
+
+# Configure enhanced readline shortcuts for better text editing
+echo "⌨️  Setting up enhanced terminal shortcuts..."
+
+# Create backup of existing .inputrc (only if no recent backup exists)
+if [ -f "$HOME/.inputrc" ]; then
+    latest_inputrc_backup=$(ls -t "$HOME/.inputrc.backup"* 2>/dev/null | head -1)
+    if [ -z "$latest_inputrc_backup" ] || [ "$HOME/.inputrc" -nt "$latest_inputrc_backup" ]; then
+        cp "$HOME/.inputrc" "$HOME/.inputrc.backup.$(date +%s)"
+        echo "📝 Backed up existing .inputrc"
+    else
+        echo "📝 Recent .inputrc backup exists, skipping backup"
+    fi
+fi
+
+# Create or update .inputrc for readline shortcuts
+cat > "$HOME/.inputrc" << 'EOF'
+# Enhanced terminal shortcuts matching standard word navigation
+
+# Ctrl+Backspace: Delete word backward
+"\C-h": backward-kill-word
+
+# Ctrl+Delete: Delete word forward  
+"\e[3;5~": kill-word
+
+# Alt+Backspace: Delete word backward (alternative)
+"\e\C-h": backward-kill-word
+
+# Ctrl+Left: Move cursor backward one word
+"\e[1;5D": backward-word
+
+# Ctrl+Right: Move cursor forward one word
+"\e[1;5C": forward-word
+
+# Home: Go to beginning of line
+"\e[H": beginning-of-line
+"\e[1~": beginning-of-line
+
+# End: Go to end of line
+"\e[F": end-of-line
+"\e[4~": end-of-line
+
+# Fn+Home (Ctrl+Home): Go to beginning of line
+"\e[1;5H": beginning-of-line
+
+# Fn+End (Ctrl+End): Go to end of line
+"\e[1;5F": end-of-line
+
+# Ctrl+A: Go to beginning of line (keep familiar shortcut)
+"\C-a": beginning-of-line
+
+# Ctrl+E: Go to end of line (keep familiar shortcut)
+"\C-e": end-of-line
+
+# Ctrl+U: Clear entire line
+"\C-u": unix-line-discard
+
+# Ctrl+K: Clear from cursor to end of line
+"\C-k": kill-line
+
+# Ctrl+W: Delete word backward (alternative to Ctrl+Backspace)
+"\C-w": backward-kill-word
+
+# Enable case-insensitive tab completion
+set completion-ignore-case on
+
+# Show completion matches immediately
+set show-all-if-ambiguous on
+
+# Use colored completion
+set colored-stats on
+set colored-completion-prefix on
+EOF
+
+echo "✅ Enhanced terminal shortcuts configured in ~/.inputrc"
 echo ""
 echo "🎯 Custom shortcuts configured:"
 echo "   • Ctrl + \\ (backslash/pipe key) = Split vertically"
@@ -190,7 +265,7 @@ echo ""
 echo "🔄 You may need to:"
 echo "   1. Close all Terminator windows"
 echo "   2. Press Ctrl+Alt+T to open a new Terminator with the updated theme"
-echo "   3. Run 'source ~/.bashrc' or start a new terminal session to see Git prompt"
+echo "   3. Run 'source ~/.bashrc' or start a new terminal to see Git prompt and shortcuts"
 echo "   4. If colors still don't apply, run: terminator --new-tab"
 echo ""
 echo "🔧 To manually reload config: Close Terminator completely and reopen"
