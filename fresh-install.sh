@@ -81,8 +81,8 @@ cat > "$terminator_config_file" << 'EOF'
   title_inactive_bg_color = "#1e1e1e"
   window_state = maximise
 [keybindings]
-  split_horiz = <Primary>apostrophe
-  split_vert = <Primary>backslash
+  split_horiz = <Primary>backslash
+  split_vert = <Primary>apostrophe
 [profiles]
   [[default]]
     background_color = "#1e1e1e"
@@ -113,7 +113,16 @@ cat > "$terminator_config_file" << 'EOF'
 [plugins]
 EOF
 
-echo "✅ Terminator configuration created with proper theming"
+echo "✅ Terminator configuration created with proper theming and keybindings"
+echo ""
+echo "🎯 Custom shortcuts configured:"
+echo "   • Ctrl + \\ (backslash/pipe key) = Split vertically"
+echo "   • Ctrl + ' (apostrophe/quote key) = Split horizontally"
+echo ""
+
+# Display the actual config for verification
+echo "📋 Keybinding section in config:"
+grep -A 3 "\[keybindings\]" "$terminator_config_file" || echo "Could not read keybindings from config"
 
 # Kill any running Terminator instances to force config reload
 if pgrep terminator > /dev/null; then
