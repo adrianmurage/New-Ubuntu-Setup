@@ -9,54 +9,141 @@ set -e  # Exit on any error
 if [ "$1" = "--revert" ] || [ "$1" = "-r" ]; then
     echo "🔄 Reverting all changes made by this script..."
     
-    # Revert keyboard shortcut to default terminal
-    echo "⌨️  Restoring default terminal shortcut..."
+    echo "🔍 Debugging current configuration..."
     
-    # First, completely reset the terminal shortcut to system default
+    # Check current terminal shortcut
+    echo "Current terminal shortcut:"
+    gsettings get org.gnome.settings-daemon.plugins.media-keys terminal 2>/dev/null || echo "No terminal shortcut found"
+    
+    # Check custom keybindings
+    echo "Current custom keybindings:"
+    gsettings get org.gnome.settings-daemon.plugins.media-keys custom-keybindings 2>/dev/null || echo "No custom keybindings found"
+    
+    # Check for terminator specific binding
+    echo "Terminator keybinding details:"
+    gsettings get org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/terminator/ name 2>/dev/null || echo "No terminator name found"
+    gsettings get org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/terminator/ command 2>/dev/null || echo "No terminator command found"
+    gsettings get org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/terminator/ binding 2>/dev/null || echo "No terminator binding found"
+    
+    echo ""
+    echo "🔧 Starting revert process..."
+    
+    # Step 1: Reset terminal shortcut to default
+    echo "Step 1: Resetting terminal shortcut..."
     gsettings reset org.gnome.settings-daemon.plugins.media-keys terminal 2>/dev/null || true
     
-    # Then explicitly set it to ensure it works
+    # Step 2: Explicitly set default terminal shortcut
+    echo "Step 2: Setting default terminal shortcut..."
     gsettings set org.gnome.settings-daemon.plugins.media-keys terminal "['<Primary><Alt>t']" 2>/dev/null || true
     
-    # Remove custom terminator shortcut completely
-    existing_keybindings=$(gsettings get org.gnome.settings-daemon.plugins.media-keys custom-keybindings 2>/dev/null || echo "@as []")
-    if [[ "$existing_keybindings" == *"terminator"* ]]; then
-        echo "🗑️  Removing custom Terminator keybinding..."
+    # Step 3: Find and remove terminator keybinding
+    echo "Step 3: Finding and removing terminator keybinding..."
+    current_bindings=$(gsettings get org.gnome.settings-daemon.plugins.media-keys custom-keybindings 2>/dev/null || echo "@as []")
+    echo "Current bindings: $current_bindings"
+    
+    # Check each custom keybinding to find the one that launches terminator
+    terminator_binding_found=""
+    if [[ "$current_bindings" != "@as []" ]] && [[ "$current_bindings" != "[]" ]]; then
+        # Extract all custom keybinding paths
+        binding_paths=$(echo "$current_bindings" | grep -oP "'/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/[^']*'" | sed "s/'//g")
         
-        # Remove terminator keybinding from the list
-        new_keybindings=$(echo "$existing_keybindings" | sed "s/, '\/org\/gnome\/settings-daemon\/plugins\/media-keys\/custom-keybindings\/terminator\/'//g" | sed "s/'\/org\/gnome\/settings-daemon\/plugins\/media-keys\/custom-keybindings\/terminator\/', //g" | sed "s/'\/org\/gnome\/settings-daemon\/plugins\/media-keys\/custom-keybindings\/terminator\/'//g")
-        
-        # Handle case where it might be the only keybinding
-        if [[ "$new_keybindings" == "[@as ]" ]] || [[ "$new_keybindings" == "[]" ]]; then
-            new_keybindings="@as []"
-        fi
-        
-        gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "$new_keybindings" 2>/dev/null || true
-        
-        # Remove the terminator keybinding configuration completely
-        dconf reset -f /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/terminator/ 2>/dev/null || true
-        
-        echo "✅ Terminator keybinding removed"
+        for path in $binding_paths; do
+            # Check if this keybinding launches terminator
+            echo "Checking keybinding at: $path"
+            name=$(gsettings get org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:${path}/ name 2>/dev/null || echo "")
+            command=$(gsettings get org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:${path}/ command 2>/dev/null || echo "")
+            binding=$(gsettings get org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:${path}/ binding 2>/dev/null || echo "")
+            
+            echo "  Name: $name"
+            echo "  Command: $command"
+            echo "  Binding: $binding"
+            
+            if [[ "$command" == *"terminator"* ]] || [[ "$name" == *"Terminator"* ]] || [[ "$name" == *"terminator"* ]]; then
+                echo "Found terminator keybinding at: $path"
+                terminator_binding_found="$path"
+                break
+            fi
+        done
     fi
     
-    echo "✅ Default terminal shortcut restored"
+    if [ -n "$terminator_binding_found" ]; then
+        echo "Removing terminator keybinding..."
+        
+        # Remove the specific terminator keybinding from the list
+        cleaned_bindings=$(echo "$current_bindings" | sed "s|, '$terminator_binding_found'||g" | sed "s|'$terminator_binding_found', ||g" | sed "s|'$terminator_binding_found'||g")
+        
+        # Clean up empty list format
+        if [[ "$cleaned_bindings" == "[@as ]" ]] || [[ "$cleaned_bindings" == "[]" ]] || [[ "$cleaned_bindings" =~ ^\[@as[[:space:]]*\]$ ]]; then
+            cleaned_bindings="@as []"
+        fi
+        
+        echo "Setting cleaned bindings: $cleaned_bindings"
+        gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "$cleaned_bindings" 2>/dev/null || true
+        
+        # Remove the actual keybinding configuration
+        echo "Removing keybinding configuration at: $terminator_binding_found"
+        dconf reset -f "${terminator_binding_found}/" 2>/dev/null || true
+        
+    else
+        echo "No terminator keybinding found in custom bindings"
+        echo "Removing ALL custom keybindings as fallback..."
+        gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "@as []" 2>/dev/null || true
+        
+        # Also try to remove common keybinding paths
+        dconf reset -f /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ 2>/dev/null || true
+        dconf reset -f /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/terminator/ 2>/dev/null || true
+    fi
     
-    # Restore bashrc from backup
+    # Step 5: Verify changes
+    echo ""
+    echo "🔍 Verification after changes:"
+    echo "Terminal shortcut now:"
+    gsettings get org.gnome.settings-daemon.plugins.media-keys terminal 2>/dev/null || echo "No terminal shortcut found"
+    echo "Custom keybindings now:"
+    gsettings get org.gnome.settings-daemon.plugins.media-keys custom-keybindings 2>/dev/null || echo "No custom keybindings found"
+    
+    # Restore bashrc from backup OR clean manually
     latest_bashrc_backup=$(ls -t "$HOME/.bashrc.backup"* 2>/dev/null | head -1)
     if [ -n "$latest_bashrc_backup" ]; then
-        echo "📝 Restoring .bashrc from backup: $(basename "$latest_bashrc_backup")"
-        cp "$latest_bashrc_backup" "$HOME/.bashrc"
-        echo "✅ .bashrc restored from backup"
+        echo "📝 Found backup: $(basename "$latest_bashrc_backup")"
+        
+        # Check if backup contains git prompt (meaning backup was made after setup)
+        if grep -q "git_branch" "$latest_bashrc_backup"; then
+            echo "⚠️  Backup contains Git prompt - backup was made after setup"
+            echo "🧹 Manually removing Git prompt from current .bashrc..."
+            
+            # Create a clean version without git prompt
+            cp "$HOME/.bashrc" "$HOME/.bashrc.temp"
+            
+            # Remove git_branch function and all PS1 lines that use it
+            sed -i '/# Git-aware prompt function/,/^$/d' "$HOME/.bashrc.temp"
+            sed -i '/git_branch()/,/^}/d' "$HOME/.bashrc.temp"
+            sed -i '/export PS1.*git_branch/d' "$HOME/.bashrc.temp"
+            sed -i '/PS1.*git_branch/d' "$HOME/.bashrc.temp"
+            
+            # Copy cleaned version back
+            cp "$HOME/.bashrc.temp" "$HOME/.bashrc"
+            rm "$HOME/.bashrc.temp"
+            
+            echo "✅ Git prompt manually removed from .bashrc"
+        else
+            echo "📝 Backup is clean - restoring from backup"
+            cp "$latest_bashrc_backup" "$HOME/.bashrc"
+            echo "✅ .bashrc restored from clean backup"
+        fi
     else
         echo "⚠️  No .bashrc backup found - removing Git prompt manually..."
         # More aggressive cleanup of Git prompt
         cp "$HOME/.bashrc" "$HOME/.bashrc.temp"
-        sed '/# Git-aware prompt function/,/export PS1.*git_branch.*$/d' "$HOME/.bashrc.temp" > "$HOME/.bashrc"
-        rm "$HOME/.bashrc.temp"
         
-        # Also remove any orphaned git_branch function calls
-        sed -i '/git_branch/d' "$HOME/.bashrc" 2>/dev/null || true
-        sed -i '/\$(git_branch)/d' "$HOME/.bashrc" 2>/dev/null || true
+        # Remove all git-related prompt modifications
+        sed -i '/# Git-aware prompt function/,/^$/d' "$HOME/.bashrc.temp"
+        sed -i '/git_branch()/,/^}/d' "$HOME/.bashrc.temp"
+        sed -i '/export PS1.*git_branch/d' "$HOME/.bashrc.temp"
+        sed -i '/PS1.*git_branch/d' "$HOME/.bashrc.temp"
+        
+        cp "$HOME/.bashrc.temp" "$HOME/.bashrc"
+        rm "$HOME/.bashrc.temp"
         
         echo "✅ Git prompt removed manually"
     fi
