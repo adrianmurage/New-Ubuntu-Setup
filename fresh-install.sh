@@ -5,6 +5,83 @@
 
 set -e  # Exit on any error
 
+# Check for revert flag
+if [ "$1" = "--revert" ] || [ "$1" = "-r" ]; then
+    echo "🔄 Reverting all changes made by this script..."
+    
+    # Revert keyboard shortcut to default terminal
+    echo "⌨️  Restoring default terminal shortcut..."
+    gsettings reset org.gnome.settings-daemon.plugins.media-keys terminal
+    
+    # Remove custom terminator shortcut
+    existing_keybindings=$(gsettings get org.gnome.settings-daemon.plugins.media-keys custom-keybindings)
+    if [[ "$existing_keybindings" == *"terminator"* ]]; then
+        # Remove terminator keybinding from the list
+        new_keybindings=$(echo "$existing_keybindings" | sed "s/, '\/org\/gnome\/settings-daemon\/plugins\/media-keys\/custom-keybindings\/terminator\/'//g" | sed "s/'\/org\/gnome\/settings-daemon\/plugins\/media-keys\/custom-keybindings\/terminator\/', //g" | sed "s/'\/org\/gnome\/settings-daemon\/plugins\/media-keys\/custom-keybindings\/terminator\/'//g")
+        gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "$new_keybindings"
+        
+        # Remove the terminator keybinding itself
+        gsettings reset org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/terminator/ name 2>/dev/null || true
+        gsettings reset org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/terminator/ command 2>/dev/null || true
+        gsettings reset org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/terminator/ binding 2>/dev/null || true
+    fi
+    
+    # Restore bashrc from backup
+    latest_bashrc_backup=$(ls -t "$HOME/.bashrc.backup"* 2>/dev/null | head -1)
+    if [ -n "$latest_bashrc_backup" ]; then
+        echo "📝 Restoring .bashrc from backup: $(basename "$latest_bashrc_backup")"
+        cp "$latest_bashrc_backup" "$HOME/.bashrc"
+    else
+        echo "⚠️  No .bashrc backup found - removing Git prompt manually..."
+        sed -i '/# Git-aware prompt function/,/^$/d' "$HOME/.bashrc" 2>/dev/null || true
+        sed -i '/git_branch()/,/^}/d' "$HOME/.bashrc" 2>/dev/null || true
+        sed -i '/export PS1.*git_branch/d' "$HOME/.bashrc" 2>/dev/null || true
+    fi
+    
+    # Restore inputrc from backup
+    latest_inputrc_backup=$(ls -t "$HOME/.inputrc.backup"* 2>/dev/null | head -1)
+    if [ -n "$latest_inputrc_backup" ]; then
+        echo "⌨️  Restoring .inputrc from backup: $(basename "$latest_inputrc_backup")"
+        cp "$latest_inputrc_backup" "$HOME/.inputrc"
+    else
+        if [ -f "$HOME/.inputrc" ]; then
+            echo "⚠️  No .inputrc backup found - removing enhanced shortcuts file..."
+            rm "$HOME/.inputrc"
+            echo "📝 Removed custom .inputrc (system will use defaults)"
+        fi
+    fi
+    
+    # Restore terminator config from backup
+    terminator_config_file="$HOME/.config/terminator/config"
+    latest_terminator_backup=$(ls -t "$terminator_config_file.backup"* 2>/dev/null | head -1)
+    if [ -n "$latest_terminator_backup" ]; then
+        echo "🎨 Restoring Terminator config from backup: $(basename "$latest_terminator_backup")"
+        cp "$latest_terminator_backup" "$terminator_config_file"
+    else
+        if [ -f "$terminator_config_file" ]; then
+            echo "⚠️  No Terminator backup found - removing custom config..."
+            rm "$terminator_config_file"
+            echo "📝 Removed custom Terminator config (will use defaults)"
+        fi
+    fi
+    
+    echo ""
+    echo "✅ Revert completed successfully!"
+    echo ""
+    echo "📋 What was reverted:"
+    echo "   • Ctrl+Alt+T now opens default terminal again"
+    echo "   • Bash prompt restored (no more Git branch info)"
+    echo "   • Terminal shortcuts restored to defaults"
+    echo "   • Terminator config restored or removed"
+    echo ""
+    echo "📦 Terminator is still installed but no longer configured"
+    echo "   To completely remove: sudo apt remove terminator"
+    echo ""
+    echo "🔄 Restart terminal or run 'source ~/.bashrc' to see changes"
+    
+    exit 0
+fi
+
 echo "🚀 Setting up Terminator terminal emulator..."
 
 # Check if running on Ubuntu/Debian
