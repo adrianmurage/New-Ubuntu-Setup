@@ -12,7 +12,10 @@ if [ "$1" = "--revert" ] || [ "$1" = "-r" ]; then
     # Revert keyboard shortcut to default terminal
     echo "⌨️  Restoring default terminal shortcut..."
     
-    # First, restore the default terminal shortcut
+    # First, completely reset the terminal shortcut to system default
+    gsettings reset org.gnome.settings-daemon.plugins.media-keys terminal
+    
+    # Then explicitly set it to ensure it works
     gsettings set org.gnome.settings-daemon.plugins.media-keys terminal "['<Primary><Alt>t']"
     
     # Remove custom terminator shortcut completely
@@ -30,13 +33,14 @@ if [ "$1" = "--revert" ] || [ "$1" = "-r" ]; then
         
         gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "$new_keybindings"
         
-        # Remove the terminator keybinding configuration
-        gsettings reset org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/terminator/ name 2>/dev/null || true
-        gsettings reset org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/terminator/ command 2>/dev/null || true
-        gsettings reset org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/terminator/ binding 2>/dev/null || true
+        # Remove the terminator keybinding configuration completely
+        dconf reset -f /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/terminator/
         
         echo "✅ Terminator keybinding removed"
     fi
+    
+    # Force reload of keybinding settings
+    gsettings set org.gnome.settings-daemon.plugins.media-keys active true
     
     echo "✅ Default terminal shortcut restored"
     
@@ -91,7 +95,7 @@ if [ "$1" = "--revert" ] || [ "$1" = "-r" ]; then
     echo "✅ Revert completed successfully!"
     echo ""
     echo "📋 What was reverted:"
-    echo "   • Ctrl+Alt+T now opens default terminal again"
+    echo "   • Ctrl+Alt+T shortcut configuration restored"
     echo "   • Bash prompt restored (no more Git branch info)"
     echo "   • Terminal shortcuts restored to defaults"
     echo "   • Terminator config restored or removed"
@@ -99,37 +103,16 @@ if [ "$1" = "--revert" ] || [ "$1" = "-r" ]; then
     echo "📦 Terminator is still installed but no longer configured"
     echo "   To completely remove: sudo apt remove terminator"
     echo ""
-    echo "🔄 Restarting desktop environment to apply changes..."
-    
-    # Restart desktop environment to ensure all changes take effect
-    if command -v gnome-shell &> /dev/null; then
-        # GNOME desktop environment
-        echo "🖥️  Detected GNOME - restarting shell..."
-        # Use nohup to prevent the command from being killed when terminal closes
-        nohup bash -c 'sleep 2 && killall gnome-shell' >/dev/null 2>&1 &
-        echo "✅ Desktop restart initiated - your desktop will reload in 2 seconds"
-    elif [ "$XDG_CURRENT_DESKTOP" = "Unity" ]; then
-        # Unity desktop environment  
-        echo "🖥️  Detected Unity - restarting..."
-        nohup bash -c 'sleep 2 && restart unity' >/dev/null 2>&1 &
-        echo "✅ Desktop restart initiated"
-    elif [ "$XDG_CURRENT_DESKTOP" = "KDE" ] || [ "$XDG_CURRENT_DESKTOP" = "kde-plasma" ]; then
-        # KDE desktop environment
-        echo "🖥️  Detected KDE - restarting..."
-        nohup bash -c 'sleep 2 && kquitapp5 plasmashell && kstart5 plasmashell' >/dev/null 2>&1 &
-        echo "✅ Desktop restart initiated"
-    else
-        echo "🖥️  Desktop environment not automatically detected"
-        echo "🔄 You may need to:"
-        echo "   - Log out and back in"
-        echo "   - Or restart manually: killall gnome-shell (for GNOME)"
-        echo "   - Or reboot if changes don't apply"
-    fi
-    
+    echo "🔄 IMPORTANT: To complete the revert process:"
+    echo "   1. Close ALL terminal windows"
+    echo "   2. Log out and log back in (safest method)"
+    echo "   3. Test: Press Ctrl+Alt+T (should open default terminal)"
     echo ""
-    echo "🎉 Revert complete! After desktop restart:"
-    echo "   - Press Ctrl+Alt+T to test (should open default terminal)" 
-    echo "   - Your prompt should be back to normal"
+    echo "⚠️  Alternative if you can't log out:"
+    echo "   • Restart manually: Alt+F2 → type 'r' → Enter (GNOME)"
+    echo "   • Or run: source ~/.bashrc (for prompt changes)"
+    echo ""
+    echo "🎉 Revert process complete - log out/in to finalize!"
     
     exit 0
 fi
