@@ -13,13 +13,13 @@ if [ "$1" = "--revert" ] || [ "$1" = "-r" ]; then
     echo "⌨️  Restoring default terminal shortcut..."
     
     # First, completely reset the terminal shortcut to system default
-    gsettings reset org.gnome.settings-daemon.plugins.media-keys terminal
+    gsettings reset org.gnome.settings-daemon.plugins.media-keys terminal 2>/dev/null || true
     
     # Then explicitly set it to ensure it works
-    gsettings set org.gnome.settings-daemon.plugins.media-keys terminal "['<Primary><Alt>t']"
+    gsettings set org.gnome.settings-daemon.plugins.media-keys terminal "['<Primary><Alt>t']" 2>/dev/null || true
     
     # Remove custom terminator shortcut completely
-    existing_keybindings=$(gsettings get org.gnome.settings-daemon.plugins.media-keys custom-keybindings)
+    existing_keybindings=$(gsettings get org.gnome.settings-daemon.plugins.media-keys custom-keybindings 2>/dev/null || echo "@as []")
     if [[ "$existing_keybindings" == *"terminator"* ]]; then
         echo "🗑️  Removing custom Terminator keybinding..."
         
@@ -31,16 +31,13 @@ if [ "$1" = "--revert" ] || [ "$1" = "-r" ]; then
             new_keybindings="@as []"
         fi
         
-        gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "$new_keybindings"
+        gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "$new_keybindings" 2>/dev/null || true
         
         # Remove the terminator keybinding configuration completely
-        dconf reset -f /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/terminator/
+        dconf reset -f /org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/terminator/ 2>/dev/null || true
         
         echo "✅ Terminator keybinding removed"
     fi
-    
-    # Force reload of keybinding settings
-    gsettings set org.gnome.settings-daemon.plugins.media-keys active true
     
     echo "✅ Default terminal shortcut restored"
     
