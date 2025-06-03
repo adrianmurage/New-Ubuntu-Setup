@@ -114,6 +114,38 @@ cat > "$terminator_config_file" << 'EOF'
 EOF
 
 echo "✅ Terminator configuration created with proper theming and keybindings"
+
+# Configure Git-aware bash prompt
+echo "🌿 Setting up Git-aware bash prompt..."
+
+# Create a backup of existing bashrc
+if [ -f "$HOME/.bashrc" ]; then
+    cp "$HOME/.bashrc" "$HOME/.bashrc.backup.$(date +%s)"
+    echo "📝 Backed up existing .bashrc"
+fi
+
+# Add Git prompt function to bashrc
+cat >> "$HOME/.bashrc" << 'EOF'
+
+# Git-aware prompt function
+git_branch() {
+    if git rev-parse --git-dir > /dev/null 2>&1; then
+        branch=$(git branch 2>/dev/null | grep '^*' | colrm 1 2)
+        if [ -n "$branch" ]; then
+            echo " [$branch]"
+        else
+            echo " [no branch]"
+        fi
+    else
+        echo " [no git repository]"
+    fi
+}
+
+# Custom prompt with Git branch info
+export PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\[\033[01;33m\]$(git_branch)\[\033[00m\]\$ '
+EOF
+
+echo "✅ Git-aware prompt configured in ~/.bashrc"
 echo ""
 echo "🎯 Custom shortcuts configured:"
 echo "   • Ctrl + \\ (backslash/pipe key) = Split vertically"
@@ -147,6 +179,7 @@ echo ""
 echo "🔄 You may need to:"
 echo "   1. Close all Terminator windows"
 echo "   2. Press Ctrl+Alt+T to open a new Terminator with the updated theme"
-echo "   3. If colors still don't apply, run: terminator --new-tab"
+echo "   3. Run 'source ~/.bashrc' or start a new terminal session to see Git prompt"
+echo "   4. If colors still don't apply, run: terminator --new-tab"
 echo ""
 echo "🔧 To manually reload config: Close Terminator completely and reopen"
