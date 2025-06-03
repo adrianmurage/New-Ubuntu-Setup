@@ -137,7 +137,7 @@ git_branch() {
             echo " [no branch]"
         fi
     else
-        echo " [no git repository]"
+        echo " [no git repo]"
     fi
 }
 
