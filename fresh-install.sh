@@ -60,41 +60,64 @@ echo "✅ Keyboard shortcut configured successfully"
 terminator_config_dir="$HOME/.config/terminator"
 terminator_config_file="$terminator_config_dir/config"
 
-if [ ! -f "$terminator_config_file" ]; then
-    echo "⚙️  Creating basic Terminator configuration..."
-    mkdir -p "$terminator_config_dir"
-    cat > "$terminator_config_file" << 'EOF'
+# Always create/overwrite Terminator config to ensure settings apply
+echo "⚙️  Creating Terminator configuration..."
+mkdir -p "$terminator_config_dir"
+
+# Remove existing config to force refresh
+if [ -f "$terminator_config_file" ]; then
+    echo "📝 Backing up existing config..."
+    cp "$terminator_config_file" "$terminator_config_file.backup.$(date +%s)"
+fi
+
+cat > "$terminator_config_file" << 'EOF'
 [global_config]
   enabled_plugins = LaunchpadCodeURLHandler, APTURLHandler, LaunchpadBugURLHandler
   suppress_multiple_term_dialog = True
   title_hide_sizetext = True
-  title_transmit_fg_color = "#d30102"
-  title_transmit_bg_color = "#ffffff"
-  title_inactive_fg_color = "#000000"
-  title_inactive_bg_color = "#c0bebf"
+  title_transmit_fg_color = "#ffffff"
+  title_transmit_bg_color = "#333333"
+  title_inactive_fg_color = "#cccccc"
+  title_inactive_bg_color = "#1e1e1e"
+  window_state = maximise
 [keybindings]
 [profiles]
   [[default]]
     background_color = "#1e1e1e"
-    background_darkness = 0.95
+    background_darkness = 0.9
     background_type = transparent
+    cursor_blink = False
     cursor_color = "#ffffff"
-    font = Monospace 11
+    cursor_shape = block
+    font = Monospace 12
     foreground_color = "#ffffff"
     show_titlebar = False
     scrollbar_position = hidden
-    palette = "#073642:#dc322f:#859900:#b58900:#268bd2:#d33682:#2aa198:#eee8d5:#002b36:#cb4b16:#586e75:#657b83:#839496:#6c71c4:#93a1a1:#fdf6e3"
+    scrollback_infinite = True
+    use_system_font = False
+    copy_on_selection = True
+    palette = "#000000:#cc0000:#4e9a06:#c4a000:#3465a4:#75507b:#06989a:#d3d7cf:#555753:#ef2929:#8ae234:#fce94f:#729fcf:#ad7fa8:#34e2e2:#eeeeec"
+    bold_is_bright = True
 [layouts]
   [[default]]
     [[[window0]]]
       type = Window
       parent = ""
+      size = 1200, 800
     [[[child1]]]
       type = Terminal
       parent = window0
+      profile = default
 [plugins]
 EOF
-    echo "✅ Basic Terminator configuration created"
+
+echo "✅ Terminator configuration created with proper theming"
+
+# Kill any running Terminator instances to force config reload
+if pgrep terminator > /dev/null; then
+    echo "🔄 Restarting Terminator to apply new configuration..."
+    pkill terminator
+    sleep 1
 fi
 
 echo ""
@@ -110,5 +133,9 @@ echo "   • Right-click in Terminator to split panes"
 echo "   • Click between panes to switch focus"
 echo "   • Drag borders to resize panes"
 echo ""
-echo "🔄 You may need to log out and back in for the shortcut to work properly"
-echo "   Or try: killall gnome-shell (this will restart the shell)"
+echo "🔄 You may need to:"
+echo "   1. Close all Terminator windows"
+echo "   2. Press Ctrl+Alt+T to open a new Terminator with the updated theme"
+echo "   3. If colors still don't apply, run: terminator --new-tab"
+echo ""
+echo "🔧 To manually reload config: Close Terminator completely and reopen"
