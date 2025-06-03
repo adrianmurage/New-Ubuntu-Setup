@@ -11,31 +11,53 @@ if [ "$1" = "--revert" ] || [ "$1" = "-r" ]; then
     
     # Revert keyboard shortcut to default terminal
     echo "⌨️  Restoring default terminal shortcut..."
-    gsettings reset org.gnome.settings-daemon.plugins.media-keys terminal
     
-    # Remove custom terminator shortcut
+    # First, restore the default terminal shortcut
+    gsettings set org.gnome.settings-daemon.plugins.media-keys terminal "['<Primary><Alt>t']"
+    
+    # Remove custom terminator shortcut completely
     existing_keybindings=$(gsettings get org.gnome.settings-daemon.plugins.media-keys custom-keybindings)
     if [[ "$existing_keybindings" == *"terminator"* ]]; then
+        echo "🗑️  Removing custom Terminator keybinding..."
+        
         # Remove terminator keybinding from the list
         new_keybindings=$(echo "$existing_keybindings" | sed "s/, '\/org\/gnome\/settings-daemon\/plugins\/media-keys\/custom-keybindings\/terminator\/'//g" | sed "s/'\/org\/gnome\/settings-daemon\/plugins\/media-keys\/custom-keybindings\/terminator\/', //g" | sed "s/'\/org\/gnome\/settings-daemon\/plugins\/media-keys\/custom-keybindings\/terminator\/'//g")
+        
+        # Handle case where it might be the only keybinding
+        if [[ "$new_keybindings" == "[@as ]" ]] || [[ "$new_keybindings" == "[]" ]]; then
+            new_keybindings="@as []"
+        fi
+        
         gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "$new_keybindings"
         
-        # Remove the terminator keybinding itself
+        # Remove the terminator keybinding configuration
         gsettings reset org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/terminator/ name 2>/dev/null || true
         gsettings reset org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/terminator/ command 2>/dev/null || true
         gsettings reset org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/terminator/ binding 2>/dev/null || true
+        
+        echo "✅ Terminator keybinding removed"
     fi
+    
+    echo "✅ Default terminal shortcut restored"
     
     # Restore bashrc from backup
     latest_bashrc_backup=$(ls -t "$HOME/.bashrc.backup"* 2>/dev/null | head -1)
     if [ -n "$latest_bashrc_backup" ]; then
         echo "📝 Restoring .bashrc from backup: $(basename "$latest_bashrc_backup")"
         cp "$latest_bashrc_backup" "$HOME/.bashrc"
+        echo "✅ .bashrc restored from backup"
     else
         echo "⚠️  No .bashrc backup found - removing Git prompt manually..."
-        sed -i '/# Git-aware prompt function/,/^$/d' "$HOME/.bashrc" 2>/dev/null || true
-        sed -i '/git_branch()/,/^}/d' "$HOME/.bashrc" 2>/dev/null || true
-        sed -i '/export PS1.*git_branch/d' "$HOME/.bashrc" 2>/dev/null || true
+        # More aggressive cleanup of Git prompt
+        cp "$HOME/.bashrc" "$HOME/.bashrc.temp"
+        sed '/# Git-aware prompt function/,/export PS1.*git_branch.*$/d' "$HOME/.bashrc.temp" > "$HOME/.bashrc"
+        rm "$HOME/.bashrc.temp"
+        
+        # Also remove any orphaned git_branch function calls
+        sed -i '/git_branch/d' "$HOME/.bashrc" 2>/dev/null || true
+        sed -i '/\$(git_branch)/d' "$HOME/.bashrc" 2>/dev/null || true
+        
+        echo "✅ Git prompt removed manually"
     fi
     
     # Restore inputrc from backup
@@ -77,7 +99,37 @@ if [ "$1" = "--revert" ] || [ "$1" = "-r" ]; then
     echo "📦 Terminator is still installed but no longer configured"
     echo "   To completely remove: sudo apt remove terminator"
     echo ""
-    echo "🔄 Restart terminal or run 'source ~/.bashrc' to see changes"
+    echo "🔄 Restarting desktop environment to apply changes..."
+    
+    # Restart desktop environment to ensure all changes take effect
+    if command -v gnome-shell &> /dev/null; then
+        # GNOME desktop environment
+        echo "🖥️  Detected GNOME - restarting shell..."
+        # Use nohup to prevent the command from being killed when terminal closes
+        nohup bash -c 'sleep 2 && killall gnome-shell' >/dev/null 2>&1 &
+        echo "✅ Desktop restart initiated - your desktop will reload in 2 seconds"
+    elif [ "$XDG_CURRENT_DESKTOP" = "Unity" ]; then
+        # Unity desktop environment  
+        echo "🖥️  Detected Unity - restarting..."
+        nohup bash -c 'sleep 2 && restart unity' >/dev/null 2>&1 &
+        echo "✅ Desktop restart initiated"
+    elif [ "$XDG_CURRENT_DESKTOP" = "KDE" ] || [ "$XDG_CURRENT_DESKTOP" = "kde-plasma" ]; then
+        # KDE desktop environment
+        echo "🖥️  Detected KDE - restarting..."
+        nohup bash -c 'sleep 2 && kquitapp5 plasmashell && kstart5 plasmashell' >/dev/null 2>&1 &
+        echo "✅ Desktop restart initiated"
+    else
+        echo "🖥️  Desktop environment not automatically detected"
+        echo "🔄 You may need to:"
+        echo "   - Log out and back in"
+        echo "   - Or restart manually: killall gnome-shell (for GNOME)"
+        echo "   - Or reboot if changes don't apply"
+    fi
+    
+    echo ""
+    echo "🎉 Revert complete! After desktop restart:"
+    echo "   - Press Ctrl+Alt+T to test (should open default terminal)" 
+    echo "   - Your prompt should be back to normal"
     
     exit 0
 fi
