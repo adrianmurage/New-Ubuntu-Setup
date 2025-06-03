@@ -80,6 +80,7 @@ curl -fsSL https://raw.githubusercontent.com/adrianmurage/New-Ubuntu-Setup/refs/
 - **Terminator stays installed** - But no longer configured or bound to Ctrl+Alt+T
 - **Complete removal**: Run `sudo apt remove terminator` if you want to uninstall completely
 - **Original experience** - Everything exactly as it was before running the terminal setup
+- **Manual restart required**: Log out and back in to complete the revert process
 
 **The revert is completely safe** and uses the same backup system that protects your files during installation!
 
