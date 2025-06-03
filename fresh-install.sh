@@ -118,13 +118,19 @@ echo "✅ Terminator configuration created with proper theming and keybindings"
 # Configure Git-aware bash prompt
 echo "🌿 Setting up Git-aware bash prompt..."
 
-# Create a backup of existing bashrc
+# Create a backup of existing bashrc (only if no recent backup exists)
 if [ -f "$HOME/.bashrc" ]; then
-    cp "$HOME/.bashrc" "$HOME/.bashrc.backup.$(date +%s)"
-    echo "📝 Backed up existing .bashrc"
+    latest_backup=$(ls -t "$HOME/.bashrc.backup"* 2>/dev/null | head -1)
+    if [ -z "$latest_backup" ] || [ "$HOME/.bashrc" -nt "$latest_backup" ]; then
+        cp "$HOME/.bashrc" "$HOME/.bashrc.backup.$(date +%s)"
+        echo "📝 Backed up existing .bashrc"
+    else
+        echo "📝 Recent backup exists, skipping backup"
+    fi
 fi
 
-# Remove any existing Git prompt configuration
+# Remove any existing Git prompt configuration to avoid duplicates
+echo "🧹 Cleaning up any existing Git prompt configuration..."
 sed -i '/# Git-aware prompt function/,/^$/d' "$HOME/.bashrc" 2>/dev/null || true
 sed -i '/git_branch()/,/^}/d' "$HOME/.bashrc" 2>/dev/null || true
 sed -i '/export PS1.*git_branch/d' "$HOME/.bashrc" 2>/dev/null || true
@@ -169,7 +175,7 @@ if pgrep terminator > /dev/null; then
 fi
 
 echo ""
-echo "🎉 Setup complete!"
+echo "🎉 Setup complete! (Safe to re-run anytime for updates)"
 echo ""
 echo "📋 Summary:"
 echo "   • Terminator has been installed"
