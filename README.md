@@ -274,10 +274,6 @@ The script automatically creates backups of:
 
 Feel free to submit issues and enhancement requests to the [GitHub repository](https://github.com/adrianmurage/New-Ubuntu-Setup).
 
-## 📄 License
-
-This project is open source and available under standard open source terms.
-
 ---
 
 **Enjoy your enhanced Ubuntu terminal experience!** 🎉
