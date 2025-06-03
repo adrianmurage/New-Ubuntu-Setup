@@ -81,6 +81,8 @@ cat > "$terminator_config_file" << 'EOF'
   title_inactive_bg_color = "#1e1e1e"
   window_state = maximise
 [keybindings]
+  split_horiz = <Primary>apostrophe
+  split_vert = <Primary>backslash
 [profiles]
   [[default]]
     background_color = "#1e1e1e"
