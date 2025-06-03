@@ -1,8 +1,13 @@
-# Fresh Ubuntu Setup Script
+# Fresh Ubuntu Setup Scripts
 
-A comprehensive script to set up a productive terminal environment on fresh Ubuntu installations. This script transforms your default terminal experience into a modern, efficient workspace with enhanced functionality.
+A collection of comprehensive scripts to set up a productive Ubuntu environment. This repository contains focused setup scripts for different aspects of your Ubuntu installation.
 
-## 🚀 What This Script Does
+## 📦 Available Scripts
+
+### 🖥️ Terminal Setup (`terminal-setup.sh`)
+Transforms your default terminal experience into a modern, efficient workspace with enhanced functionality.
+
+## 🚀 What the Terminal Setup Script Does
 
 ### Terminal Emulator Enhancement
 - **Installs Terminator** - A powerful terminal emulator with splitting capabilities
@@ -34,34 +39,34 @@ A comprehensive script to set up a productive terminal environment on fresh Ubun
 - **Internet connection** for package downloads
 - **sudo privileges** for package installation
 
-## ⚡ Quick Installation
+## ⚡ Quick Installation - Terminal Setup
 
 ### One-Line Install (Recommended)
 ```bash
-curl -fsSL https://raw.githubusercontent.com/adrianmurage/New-Ubuntu-Setup/refs/heads/main/fresh-install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/adrianmurage/New-Ubuntu-Setup/refs/heads/main/terminal-setup.sh | bash
 ```
 
 ### Alternative: Download and Run
 ```bash
 # Download the script
-curl -fsSL https://raw.githubusercontent.com/adrianmurage/New-Ubuntu-Setup/refs/heads/main/fresh-install.sh -o fresh-install.sh
+curl -fsSL https://raw.githubusercontent.com/adrianmurage/New-Ubuntu-Setup/refs/heads/main/terminal-setup.sh -o terminal-setup.sh
 
 # Make executable and run
-chmod +x fresh-install.sh && ./fresh-install.sh
+chmod +x terminal-setup.sh && ./terminal-setup.sh
 ```
 
 ### Using wget
 ```bash
-wget -qO- https://raw.githubusercontent.com/adrianmurage/New-Ubuntu-Setup/refs/heads/main/fresh-install.sh | bash
+wget -qO- https://raw.githubusercontent.com/adrianmurage/New-Ubuntu-Setup/refs/heads/main/terminal-setup.sh | bash
 ```
 
-## ↩️ Easy Revert (Undo All Changes)
+## ↩️ Easy Revert (Undo Terminal Setup)
 
-Don't like the setup? No problem! You can safely revert everything:
+Don't like the terminal setup? No problem! You can safely revert everything:
 
 ```bash
 # Revert all changes back to original state
-curl -fsSL https://raw.githubusercontent.com/adrianmurage/New-Ubuntu-Setup/refs/heads/main/fresh-install.sh | bash -s -- --revert
+curl -fsSL https://raw.githubusercontent.com/adrianmurage/New-Ubuntu-Setup/refs/heads/main/terminal-setup.sh | bash -s -- --revert
 ```
 
 ### What Gets Reverted
@@ -74,9 +79,21 @@ curl -fsSL https://raw.githubusercontent.com/adrianmurage/New-Ubuntu-Setup/refs/
 ### After Revert
 - **Terminator stays installed** - But no longer configured or bound to Ctrl+Alt+T
 - **Complete removal**: Run `sudo apt remove terminator` if you want to uninstall completely
-- **Original experience** - Everything exactly as it was before running the script
+- **Original experience** - Everything exactly as it was before running the terminal setup
 
 **The revert is completely safe** and uses the same backup system that protects your files during installation!
+
+## 🚀 Future Scripts (Coming Soon)
+
+This repository will expand to include additional setup scripts:
+
+- **🌐 `networking-setup.sh`** - VPN, SSH keys, network tools
+- **⚙️ `development-setup.sh`** - IDEs, compilers, development tools  
+- **🎨 `desktop-setup.sh`** - Themes, extensions, desktop customization
+- **🔒 `security-setup.sh`** - Firewall, security tools, hardening
+- **📦 `apps-setup.sh`** - Essential applications and productivity tools
+
+Each script will be focused, independent, and include the same revert functionality!
 
 ## 🛠️ Installation Steps
 
@@ -165,17 +182,17 @@ lsb_release -a
 ping -c 3 google.com
 
 # Try running with explicit bash
-bash <(curl -fsSL https://raw.githubusercontent.com/adrianmurage/New-Ubuntu-Setup/refs/heads/main/fresh-install.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/adrianmurage/New-Ubuntu-Setup/refs/heads/main/terminal-setup.sh)
 ```
 
 ### Don't Like the Setup?
 ```bash
 # Revert everything back to original state
-curl -fsSL https://raw.githubusercontent.com/adrianmurage/New-Ubuntu-Setup/refs/heads/main/fresh-install.sh | bash -s -- --revert
+curl -fsSL https://raw.githubusercontent.com/adrianmurage/New-Ubuntu-Setup/refs/heads/main/terminal-setup.sh | bash -s -- --revert
 
 # Or download and run revert
-curl -fsSL https://raw.githubusercontent.com/adrianmurage/New-Ubuntu-Setup/refs/heads/main/fresh-install.sh -o fresh-install.sh
-chmod +x fresh-install.sh && ./fresh-install.sh --revert
+curl -fsSL https://raw.githubusercontent.com/adrianmurage/New-Ubuntu-Setup/refs/heads/main/terminal-setup.sh -o terminal-setup.sh
+chmod +x terminal-setup.sh && ./terminal-setup.sh --revert
 ```
 
 ### Shortcut Not Working
@@ -234,16 +251,16 @@ This script is designed to be completely safe and lightweight:
 
 **Your system performance remains exactly the same** - just with enhanced functionality! 🚀
 
-## 🔄 Updating
+## 🔄 Updating the Terminal Setup
 
-To get the latest features and improvements:
+To get the latest features and improvements for the terminal setup:
 
 ```bash
 # Simply re-run the installation command
-curl -fsSL https://raw.githubusercontent.com/adrianmurage/New-Ubuntu-Setup/refs/heads/main/fresh-install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/adrianmurage/New-Ubuntu-Setup/refs/heads/main/terminal-setup.sh | bash
 ```
 
-The script intelligently updates your configuration while preserving your customizations.
+The script intelligently updates your terminal configuration while preserving your customizations.
 
 ## 📝 What Gets Backed Up
 
