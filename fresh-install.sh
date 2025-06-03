@@ -124,6 +124,11 @@ if [ -f "$HOME/.bashrc" ]; then
     echo "📝 Backed up existing .bashrc"
 fi
 
+# Remove any existing Git prompt configuration
+sed -i '/# Git-aware prompt function/,/^$/d' "$HOME/.bashrc" 2>/dev/null || true
+sed -i '/git_branch()/,/^}/d' "$HOME/.bashrc" 2>/dev/null || true
+sed -i '/export PS1.*git_branch/d' "$HOME/.bashrc" 2>/dev/null || true
+
 # Add Git prompt function to bashrc
 cat >> "$HOME/.bashrc" << 'EOF'
 
