@@ -1,19 +1,37 @@
-# Fresh Ubuntu Setup Scripts
+# Fresh Linux Setup Scripts
 
-A collection of comprehensive scripts to set up a productive Ubuntu environment. This repository contains focused setup scripts for different aspects of your Ubuntu installation.
+A collection of comprehensive scripts to set up a productive Linux environment. This repository contains focused setup scripts for different aspects of your Ubuntu or Fedora installation.
+
+## 🐧 Supported Operating Systems
+
+### Ubuntu/Debian Support
+- **Ubuntu 18.04+** or any **Debian-based** distribution
+- Uses `apt` package manager
+- Original script with comprehensive testing
+
+### Fedora Support 🆕
+- **Fedora 35+** (tested on Fedora 42)
+- Uses `dnf` package manager  
+- Includes **Ptyxis terminal** support (Fedora's default)
+- **Fixed pane divider visibility** in dark mode
 
 ## 📦 Available Scripts
 
-### 🖥️ Terminal Setup (`terminal-setup.sh`)
-Transforms your default terminal experience into a modern, efficient workspace with enhanced functionality.
+### 🖥️ Terminal Setup
+Choose the script for your operating system:
+- **`terminal-setup.sh`** - Ubuntu/Debian version
+- **`fedora-terminal-setup.sh`** - Fedora version 🆕
 
-## 🚀 What the Terminal Setup Script Does
+Both scripts provide the same enhanced terminal experience with platform-specific optimizations.
+
+## 🚀 What the Terminal Setup Scripts Do
 
 ### Terminal Emulator Enhancement
 - **Installs Terminator** - A powerful terminal emulator with splitting capabilities
 - **Replaces Ctrl+Alt+T shortcut** - Opens Terminator instead of default terminal
-- **Modern dark theme** - Clean interface with transparency and optimized colors
+- **Modern dark theme** - Clean interface with optimized colors
 - **Enhanced splitting** - Easy pane management with intuitive shortcuts
+- **🔧 Fedora-specific**: Fixed pane divider visibility in dark mode
 
 ### Git Integration
 - **Git-aware prompt** - Shows current branch or "no git repo" status
@@ -31,22 +49,33 @@ Transforms your default terminal experience into a modern, efficient workspace w
 - **Mouse support** - Click between panes to switch focus
 - **No scrollbars/titlebars** - Clean, minimal interface
 - **Intelligent tab completion** - Case-insensitive with colored results
+- **🔧 Fedora-specific**: Visible pane dividers in both light and dark system themes
 
 ## 📋 Requirements
 
+### Ubuntu/Debian
 - **Ubuntu 18.04+** or **Debian-based** distribution
 - **Desktop environment** (GNOME/Unity recommended)
 - **Internet connection** for package downloads
 - **sudo privileges** for package installation
 
-## ⚡ Quick Installation - Terminal Setup
+### Fedora 🆕
+- **Fedora 35+** (tested on Fedora 42)
+- **Desktop environment** (GNOME recommended)
+- **Internet connection** for package downloads
+- **sudo privileges** for package installation
+- **Ptyxis or Terminator** will be configured based on availability
 
-### One-Line Install (Recommended)
+## ⚡ Quick Installation
+
+### Ubuntu/Debian - Terminal Setup
+
+#### One-Line Install (Recommended)
 ```bash
 curl -fsSL https://raw.githubusercontent.com/adrianmurage/New-Ubuntu-Setup/refs/heads/main/terminal-setup.sh | bash
 ```
 
-### Alternative: Download and Run
+#### Alternative: Download and Run
 ```bash
 # Download the script
 curl -fsSL https://raw.githubusercontent.com/adrianmurage/New-Ubuntu-Setup/refs/heads/main/terminal-setup.sh -o terminal-setup.sh
@@ -55,18 +84,46 @@ curl -fsSL https://raw.githubusercontent.com/adrianmurage/New-Ubuntu-Setup/refs/
 chmod +x terminal-setup.sh && ./terminal-setup.sh
 ```
 
-### Using wget
+#### Using wget
 ```bash
 wget -qO- https://raw.githubusercontent.com/adrianmurage/New-Ubuntu-Setup/refs/heads/main/terminal-setup.sh | bash
+```
+
+### Fedora - Terminal Setup 🆕
+
+#### One-Line Install (Recommended)
+```bash
+curl -fsSL https://raw.githubusercontent.com/adrianmurage/New-Ubuntu-Setup/refs/heads/main/fedora-terminal-setup.sh | bash
+```
+
+#### Alternative: Download and Run
+```bash
+# Download the Fedora script
+curl -fsSL https://raw.githubusercontent.com/adrianmurage/New-Ubuntu-Setup/refs/heads/main/fedora-terminal-setup.sh -o fedora-terminal-setup.sh
+
+# Make executable and run
+chmod +x fedora-terminal-setup.sh && ./fedora-terminal-setup.sh
+```
+
+#### Using wget
+```bash
+wget -qO- https://raw.githubusercontent.com/adrianmurage/New-Ubuntu-Setup/refs/heads/main/fedora-terminal-setup.sh | bash
 ```
 
 ## ↩️ Easy Revert (Undo Terminal Setup)
 
 Don't like the terminal setup? No problem! You can safely revert everything:
 
+### Ubuntu/Debian Revert
 ```bash
 # Revert all changes back to original state
 curl -fsSL https://raw.githubusercontent.com/adrianmurage/New-Ubuntu-Setup/refs/heads/main/terminal-setup.sh | bash -s -- --revert
+```
+
+### Fedora Revert 🆕
+```bash
+# Revert all changes back to original state
+curl -fsSL https://raw.githubusercontent.com/adrianmurage/New-Ubuntu-Setup/refs/heads/main/fedora-terminal-setup.sh | bash -s -- --revert
 ```
 
 ### What Gets Reverted
@@ -78,15 +135,35 @@ curl -fsSL https://raw.githubusercontent.com/adrianmurage/New-Ubuntu-Setup/refs/
 
 ### After Revert
 - **Terminator stays installed** - But no longer configured or bound to Ctrl+Alt+T
-- **Complete removal**: Run `sudo apt remove terminator` if you want to uninstall completely
+- **Complete removal**: 
+  - Ubuntu: `sudo apt remove terminator`
+  - Fedora: `sudo dnf remove terminator`
 - **Original experience** - Everything exactly as it was before running the terminal setup
 - **Manual restart required**: Log out and back in to complete the revert process
 
 **The revert is completely safe** and uses the same backup system that protects your files during installation!
 
+## 🆕 Fedora-Specific Improvements
+
+The Fedora version includes several enhancements over the original Ubuntu script:
+
+### Fixed Dark Mode Issues
+- **Visible pane dividers** - No more invisible splitters in dark system themes
+- **Handle sizing** - 3px thick dividers that are always visible
+- **Better contrast** - Inactive panes dimmed for clear focus indication
+
+### Ptyxis Integration
+- **Native Fedora terminal** - Option to enhance Ptyxis instead of installing Terminator
+- **Modern terminal** - Ptyxis is Fedora's new default terminal emulator
+- **Consistent theming** - Works perfectly with Fedora's design language
+
+### DNF Package Management
+- **Fedora package manager** - Uses `dnf` instead of `apt`
+- **Optimized installation** - Faster package resolution and installation
+
 ## 🚀 Future Scripts (Coming Soon)
 
-This repository will expand to include additional setup scripts:
+This repository will expand to include additional setup scripts for both Ubuntu and Fedora:
 
 - **🌐 `networking-setup.sh`** - VPN, SSH keys, network tools
 - **⚙️ `development-setup.sh`** - IDEs, compilers, development tools  
@@ -94,12 +171,12 @@ This repository will expand to include additional setup scripts:
 - **🔒 `security-setup.sh`** - Firewall, security tools, hardening
 - **📦 `apps-setup.sh`** - Essential applications and productivity tools
 
-Each script will be focused, independent, and include the same revert functionality!
+Each script will be focused, independent, and include the same revert functionality for both operating systems!
 
 ## 🛠️ Installation Steps
 
 1. **Open default terminal** (Ctrl+Alt+T)
-2. **Run the installation command** (see above)
+2. **Run the installation command** for your OS (see above)
 3. **Wait for completion** (~1-2 minutes)
 4. **Close terminal and press Ctrl+Alt+T** to open Terminator
 5. **Enjoy your enhanced terminal experience!**
@@ -153,10 +230,11 @@ Each script will be focused, independent, and include the same revert functional
 murage@computer:~/project [main]$ 
 murage@computer:~/Documents [no git repo]$ 
 ```
-- Dark theme with transparency
+- Dark theme with optimized colors
 - Git branch information
 - Enhanced keyboard shortcuts
 - Split-pane capability
+- **🆕 Fedora**: Visible pane dividers in dark mode
 
 ## 🔧 Customization
 
@@ -175,6 +253,8 @@ Managed by: `gsettings` (GNOME keyboard shortcuts)
 ## 🐛 Troubleshooting
 
 ### Script Won't Run
+
+#### Ubuntu/Debian
 ```bash
 # Check if you're on Ubuntu/Debian
 lsb_release -a
@@ -186,14 +266,30 @@ ping -c 3 google.com
 bash <(curl -fsSL https://raw.githubusercontent.com/adrianmurage/New-Ubuntu-Setup/refs/heads/main/terminal-setup.sh)
 ```
 
+#### Fedora 🆕
+```bash
+# Check if you're on Fedora
+cat /etc/fedora-release
+
+# Ensure you have internet connection
+ping -c 3 google.com
+
+# Try running with explicit bash
+bash <(curl -fsSL https://raw.githubusercontent.com/adrianmurage/New-Ubuntu-Setup/refs/heads/main/fedora-terminal-setup.sh)
+```
+
 ### Don't Like the Setup?
+
+#### Ubuntu/Debian
 ```bash
 # Revert everything back to original state
 curl -fsSL https://raw.githubusercontent.com/adrianmurage/New-Ubuntu-Setup/refs/heads/main/terminal-setup.sh | bash -s -- --revert
+```
 
-# Or download and run revert
-curl -fsSL https://raw.githubusercontent.com/adrianmurage/New-Ubuntu-Setup/refs/heads/main/terminal-setup.sh -o terminal-setup.sh
-chmod +x terminal-setup.sh && ./terminal-setup.sh --revert
+#### Fedora 🆕
+```bash
+# Revert everything back to original state  
+curl -fsSL https://raw.githubusercontent.com/adrianmurage/New-Ubuntu-Setup/refs/heads/main/fedora-terminal-setup.sh | bash -s -- --revert
 ```
 
 ### Shortcut Not Working
@@ -226,6 +322,30 @@ gsettings list-recursively | grep terminal
 type git_branch
 ```
 
+### Fedora-Specific Issues 🆕
+
+#### Pane Dividers Still Not Visible
+```bash
+# Kill all Terminator processes and restart
+pkill terminator
+terminator
+
+# Check if config applied correctly
+cat ~/.config/terminator/config | grep handle_size
+```
+
+#### DNF Package Issues
+```bash
+# Update package cache
+sudo dnf check-update
+
+# Clear DNF cache
+sudo dnf clean all
+
+# Try installing Terminator manually
+sudo dnf install -y terminator
+```
+
 ## ⚡ Performance & Resource Usage
 
 ### No Performance Impact
@@ -256,24 +376,35 @@ This script is designed to be completely safe and lightweight:
 
 To get the latest features and improvements for the terminal setup:
 
+### Ubuntu/Debian
 ```bash
 # Simply re-run the installation command
 curl -fsSL https://raw.githubusercontent.com/adrianmurage/New-Ubuntu-Setup/refs/heads/main/terminal-setup.sh | bash
 ```
 
-The script intelligently updates your terminal configuration while preserving your customizations.
+### Fedora 🆕
+```bash
+# Simply re-run the installation command
+curl -fsSL https://raw.githubusercontent.com/adrianmurage/New-Ubuntu-Setup/refs/heads/main/fedora-terminal-setup.sh | bash
+```
+
+The scripts intelligently update your terminal configuration while preserving your customizations.
 
 ## 📝 What Gets Backed Up
 
-The script automatically creates backups of:
+The scripts automatically create backups of:
 - `~/.bashrc` → `~/.bashrc.backup.[timestamp]`
 - `~/.inputrc` → `~/.inputrc.backup.[timestamp]`
 - `~/.config/terminator/config` → `~/.config/terminator/config.backup.[timestamp]`
+- **🆕 Fedora**: `~/.config/ptyxis-settings.backup` (if using Ptyxis enhancement)
 
 ## 🤝 Contributing
 
 Feel free to submit issues and enhancement requests to the [GitHub repository](https://github.com/adrianmurage/New-Ubuntu-Setup).
 
+### Adding New Operating System Support
+We welcome contributions to support additional Linux distributions! Please follow the pattern established by the Ubuntu and Fedora scripts.
+
 ---
 
-**Enjoy your enhanced Ubuntu terminal experience!** 🎉
+**Enjoy your enhanced Linux terminal experience on Ubuntu or Fedora!** 🎉
