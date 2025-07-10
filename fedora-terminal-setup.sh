@@ -283,7 +283,6 @@ cat > "$terminator_config_file" << 'EOF'
   window_state = maximise
   handle_size = 3
   inactive_color_offset = 0.85
-  borderless = True
   tab_position = hidden
   close_button_on_tab = False
 [keybindings]
@@ -299,7 +298,7 @@ cat > "$terminator_config_file" << 'EOF'
     cursor_shape = block
     font = Monospace 11
     foreground_color = "#f0f0f0"
-    show_titlebar = False
+    show_titlebar = True
     scrollbar_position = hidden
     scrollback_infinite = True
     use_system_font = False
@@ -332,8 +331,8 @@ echo "✅ Terminator configuration created with modern Ptyxis-like appearance"
 echo ""
 echo "🎨 Modern styling applied:"
 echo "   • Clean dark theme matching GNOME/Ptyxis design"
-echo "   • Borderless window for seamless integration"
-echo "   • Hidden tabs and title bars for minimal interface"
+echo "   • Minimal title bar for window dragging (but still clean)"
+echo "   • Hidden tabs and scrollbars for cleaner interface"
 echo "   • Pane borders visible in both light and dark system themes"
 echo "   • Disabled all terminal bells for quiet operation"
 echo "   • Modern color palette with proper contrast"
@@ -478,7 +477,8 @@ echo ""
 echo "📋 Summary:"
 echo "   • Terminator has been installed with modern styling"
 echo "   • Ctrl+Alt+T now opens Terminator instead of the default terminal"
-echo "   • Ptyxis-inspired design with clean, borderless interface"
+echo "   • Ptyxis-inspired design with clean, minimal interface"
+echo "   • Draggable title bar with modern dark styling"
 echo "   • Fixed dark mode visibility issues"
 echo "   • Enhanced Git prompt and keyboard shortcuts configured"
 echo ""
