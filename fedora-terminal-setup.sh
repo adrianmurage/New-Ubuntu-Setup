@@ -19,8 +19,11 @@ if [ "$1" = "--revert" ] || [ "$1" = "-r" ]; then
     echo "Current custom keybindings:"
     gsettings get org.gnome.settings-daemon.plugins.media-keys custom-keybindings 2>/dev/null || echo "No custom keybindings found"
     
-    # Check for terminator specific binding
+    # Check for terminator specific binding (check both old terminator path and new custom0 path)
     echo "Terminator keybinding details:"
+    gsettings get org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ name 2>/dev/null || echo "No custom0 name found"
+    gsettings get org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ command 2>/dev/null || echo "No custom0 command found"
+    gsettings get org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ binding 2>/dev/null || echo "No custom0 binding found"
     gsettings get org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/terminator/ name 2>/dev/null || echo "No terminator name found"
     gsettings get org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/terminator/ command 2>/dev/null || echo "No terminator command found"
     gsettings get org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/terminator/ binding 2>/dev/null || echo "No terminator binding found"
@@ -58,7 +61,7 @@ if [ "$1" = "--revert" ] || [ "$1" = "-r" ]; then
             echo "  Command: $command"
             echo "  Binding: $binding"
             
-            if [[ "$command" == *"terminator"* ]] || [[ "$name" == *"Terminator"* ]] || [[ "$name" == *"terminator"* ]]; then
+            if [[ "$command" == *"terminator"* ]] || [[ "$name" == *"Terminator"* ]] || [[ "$name" == *"terminator"* ]] || [[ "$path" == *"custom0"* ]]; then
                 echo "Found terminator keybinding at: $path"
                 terminator_binding_found="$path"
                 break
@@ -227,25 +230,27 @@ if [ -z "$DISPLAY" ] && [ -z "$WAYLAND_DISPLAY" ]; then
     echo "⚠️  Warning: No GUI environment detected. Key bindings may not work until you log into a desktop session."
 fi
 
-# Disable the default terminal shortcut
+# Configure keyboard shortcuts for Terminator
 echo "🔧 Configuring keyboard shortcuts..."
-gsettings set org.gnome.settings-daemon.plugins.media-keys terminal "[]"
 
-# Set up custom shortcut for Terminator
-gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/terminator/ name "Open Terminator"
-gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/terminator/ command "terminator"
-gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/terminator/ binding "<Primary><Alt>t"
+# Note: Fedora 42 doesn't have the 'terminal' key that Ubuntu has, so we skip disabling it
+echo "ℹ️  Fedora detected - skipping default terminal shortcut disable (not needed)"
+
+# Set up custom shortcut for Terminator using custom0 path (more reliable than terminator path)
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ name "Open Terminator"
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ command "terminator"
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ binding "<Primary><Alt>t"
 
 # Get existing custom keybindings and add our new one
 existing_keybindings=$(gsettings get org.gnome.settings-daemon.plugins.media-keys custom-keybindings)
 if [[ "$existing_keybindings" == "@as []" ]]; then
     # No existing custom keybindings
-    gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/terminator/']"
+    gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/']"
 else
     # Add to existing keybindings if not already present
-    if [[ "$existing_keybindings" != *"terminator"* ]]; then
+    if [[ "$existing_keybindings" != *"custom0"* ]]; then
         # Remove the closing bracket and add our keybinding
-        new_keybindings=$(echo "$existing_keybindings" | sed "s/]$/, '\/org\/gnome\/settings-daemon\/plugins\/media-keys\/custom-keybindings\/terminator\/']/"  | sed "s/\[@as /[/")
+        new_keybindings=$(echo "$existing_keybindings" | sed "s/]$/, '\/org\/gnome\/settings-daemon\/plugins\/media-keys\/custom-keybindings\/custom0\/']/"  | sed "s/\[@as /[/")
         gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "$new_keybindings"
     fi
 fi
@@ -272,33 +277,43 @@ cat > "$terminator_config_file" << 'EOF'
   suppress_multiple_term_dialog = True
   title_hide_sizetext = True
   title_transmit_fg_color = "#ffffff"
-  title_transmit_bg_color = "#2d3142"
+  title_transmit_bg_color = "#1a1a1a"
   title_inactive_fg_color = "#cccccc"
-  title_inactive_bg_color = "#2d3142"
+  title_inactive_bg_color = "#1a1a1a"
   window_state = maximise
   handle_size = 3
-  inactive_color_offset = 0.8
+  inactive_color_offset = 0.85
+  borderless = True
+  tab_position = hidden
+  close_button_on_tab = False
 [keybindings]
   split_horiz = <Primary>backslash
   split_vert = <Primary>apostrophe
 [profiles]
   [[default]]
-    background_color = "#2d3142"
+    background_color = "#1a1a1a"
     background_darkness = 1.0
     background_type = solid
     cursor_blink = False
-    cursor_color = "#f4f3ee"
+    cursor_color = "#f0f0f0"
     cursor_shape = block
-    font = Monospace 12
-    foreground_color = "#f4f3ee"
+    font = Monospace 11
+    foreground_color = "#f0f0f0"
     show_titlebar = False
     scrollbar_position = hidden
     scrollback_infinite = True
     use_system_font = False
     copy_on_selection = True
-    palette = "#2d3142:#ef476f:#06ffa5:#ffd23f:#118ab2:#9d4edd:#06d6a0:#f4f3ee:#8d99ae:#ef476f:#06ffa5:#ffd23f:#118ab2:#9d4edd:#06d6a0:#ffffff"
+    palette = "#1a1a1a:#e74c3c:#2ecc71:#f39c12:#3498db:#9b59b6:#1abc9c:#ecf0f1:#555555:#c0392b:#27ae60:#d68910:#2980b9:#8e44ad:#16a085:#ffffff"
     bold_is_bright = True
     word_chars = "-,./?%&#:_=+@~"
+    urgent_bell = False
+    audible_bell = False
+    visible_bell = False
+    login_shell = False
+    use_custom_command = False
+    exit_action = close
+    force_no_bell = True
 [layouts]
   [[default]]
     [[[window0]]]
@@ -312,13 +327,16 @@ cat > "$terminator_config_file" << 'EOF'
 [plugins]
 EOF
 
-echo "✅ Terminator configuration created with proper theming and visible pane dividers"
+echo "✅ Terminator configuration created with modern Ptyxis-like appearance"
 
 echo ""
-echo "🔧 Fixed pane divider visibility issue:"
-echo "   • Pane borders now visible in both light and dark system themes"
-echo "   • Added explicit handle styling (handle_size = 3)"
-echo "   • Inactive panes slightly dimmed for better focus indication"
+echo "🎨 Modern styling applied:"
+echo "   • Clean dark theme matching GNOME/Ptyxis design"
+echo "   • Borderless window for seamless integration"
+echo "   • Hidden tabs and title bars for minimal interface"
+echo "   • Pane borders visible in both light and dark system themes"
+echo "   • Disabled all terminal bells for quiet operation"
+echo "   • Modern color palette with proper contrast"
 
 # Configure Git-aware bash prompt
 echo "🌿 Setting up Git-aware bash prompt..."
@@ -458,10 +476,11 @@ echo ""
 echo "🎉 Setup complete! (Safe to re-run anytime for updates)"
 echo ""
 echo "📋 Summary:"
-echo "   • Terminator has been installed"
+echo "   • Terminator has been installed with modern styling"
 echo "   • Ctrl+Alt+T now opens Terminator instead of the default terminal"
-echo "   • Configuration created with visible pane dividers in all themes"
+echo "   • Ptyxis-inspired design with clean, borderless interface"
 echo "   • Fixed dark mode visibility issues"
+echo "   • Enhanced Git prompt and keyboard shortcuts configured"
 echo ""
 echo "💡 Usage tips:"
 echo "   • Right-click in Terminator to split panes"
