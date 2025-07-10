@@ -1,4 +1,7 @@
-# Fresh Linux Setup Scripts
+### DNF Package Management
+- **Fedora package manager** - Uses `dnf` instead of `apt`
+- **Optimized installation** - Faster package resolution and installation
+- **Better error handling** - Graceful handling of Fedora-specific package conflicts# Fresh Linux Setup Scripts
 
 A collection of comprehensive scripts to set up a productive Linux environment. This repository contains focused setup scripts for different aspects of your Ubuntu or Fedora installation.
 
@@ -29,9 +32,10 @@ Both scripts provide the same enhanced terminal experience with platform-specifi
 ### Terminal Emulator Enhancement
 - **Installs Terminator** - A powerful terminal emulator with splitting capabilities
 - **Replaces Ctrl+Alt+T shortcut** - Opens Terminator instead of default terminal
-- **Modern dark theme** - Clean interface with optimized colors
+- **Modern Ptyxis-inspired design** - Clean, borderless interface matching GNOME
 - **Enhanced splitting** - Easy pane management with intuitive shortcuts
-- **🔧 Fedora-specific**: Fixed pane divider visibility in dark mode
+- **🔧 Fedora-specific**: Fixed keyboard shortcut logic and modern styling
+- **🔧 Fedora-specific**: Seamless integration with GNOME desktop environment
 
 ### Git Integration
 - **Git-aware prompt** - Shows current branch or "no git repo" status
@@ -47,8 +51,9 @@ Both scripts provide the same enhanced terminal experience with platform-specifi
 ### Terminal Features
 - **Split panes** - Ctrl+\ (horizontal) and Ctrl+' (vertical)
 - **Mouse support** - Click between panes to switch focus
-- **No scrollbars/titlebars** - Clean, minimal interface
+- **Modern interface** - Clean, borderless design matching GNOME aesthetics
 - **Intelligent tab completion** - Case-insensitive with colored results
+- **🔧 Fedora-specific**: Modern Ptyxis-inspired styling with seamless GNOME integration
 - **🔧 Fedora-specific**: Visible pane dividers in both light and dark system themes
 
 ## 📋 Requirements
@@ -60,11 +65,11 @@ Both scripts provide the same enhanced terminal experience with platform-specifi
 - **sudo privileges** for package installation
 
 ### Fedora 🆕
-- **Fedora 35+** (tested on Fedora 42)
+- **Fedora 35+** (fully tested and optimized for Fedora 42)
 - **Desktop environment** (GNOME recommended)
 - **Internet connection** for package downloads
 - **sudo privileges** for package installation
-- **Ptyxis or Terminator** will be configured based on availability
+- **Modern styling** - Enhanced to match GNOME design language
 
 ## ⚡ Quick Installation
 
@@ -152,14 +157,23 @@ The Fedora version includes several enhancements over the original Ubuntu script
 - **Handle sizing** - 3px thick dividers that are always visible
 - **Better contrast** - Inactive panes dimmed for clear focus indication
 
+### Modern Ptyxis-Inspired Design 🎨
+- **Borderless interface** - Clean, seamless integration with GNOME
+- **Hidden tabs and title bars** - Minimal design matching Ptyxis aesthetic
+- **Modern dark theme** - `#1a1a1a` background matching GNOME design language
+- **Enhanced typography** - Optimized Monospace 11 font for better readability
+- **Quiet operation** - All terminal bells disabled for professional use
+- **Modern color palette** - Clean, high-contrast colors for better accessibility
+
+### Fedora 42 Compatibility
+- **Fixed keyboard shortcut logic** - Handles Fedora's different gsettings structure
+- **Corrected command binding** - Ensures Terminator (not Ptyxis) opens with Ctrl+Alt+T
+- **Better error handling** - Graceful handling of Fedora-specific configurations
+
 ### Ptyxis Integration
 - **Native Fedora terminal** - Option to enhance Ptyxis instead of installing Terminator
 - **Modern terminal** - Ptyxis is Fedora's new default terminal emulator
 - **Consistent theming** - Works perfectly with Fedora's design language
-
-### DNF Package Management
-- **Fedora package manager** - Uses `dnf` instead of `apt`
-- **Optimized installation** - Faster package resolution and installation
 
 ## 🚀 Future Scripts (Coming Soon)
 
@@ -230,11 +244,12 @@ Each script will be focused, independent, and include the same revert functional
 murage@computer:~/project [main]$ 
 murage@computer:~/Documents [no git repo]$ 
 ```
-- Dark theme with optimized colors
-- Git branch information
-- Enhanced keyboard shortcuts
-- Split-pane capability
-- **🆕 Fedora**: Visible pane dividers in dark mode
+- **Modern dark theme** with seamless GNOME integration
+- **Borderless interface** - Clean, professional appearance
+- **Git branch information** - Always visible in prompt
+- **Enhanced keyboard shortcuts** - Modern text editing
+- **Split-pane capability** - Multiple terminals in one window
+- **🆕 Fedora**: Ptyxis-inspired design with visible pane dividers
 
 ## 🔧 Customization
 
@@ -324,6 +339,15 @@ type git_branch
 
 ### Fedora-Specific Issues 🆕
 
+#### Modern Styling Applied Successfully
+```bash
+# Verify the modern configuration was applied
+cat ~/.config/terminator/config | grep -A 5 "\[global_config\]"
+
+# Check if borderless design is active
+cat ~/.config/terminator/config | grep "borderless"
+```
+
 #### Pane Dividers Still Not Visible
 ```bash
 # Kill all Terminator processes and restart
@@ -332,6 +356,14 @@ terminator
 
 # Check if config applied correctly
 cat ~/.config/terminator/config | grep handle_size
+```
+
+#### Keyboard Shortcut Issues
+```bash
+# Verify the correct keybinding was set
+gsettings get org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ command
+
+# Should return 'terminator' not 'ptyxis'
 ```
 
 #### DNF Package Issues
@@ -408,3 +440,5 @@ We welcome contributions to support additional Linux distributions! Please follo
 ---
 
 **Enjoy your enhanced Linux terminal experience on Ubuntu or Fedora!** 🎉
+
+**🆕 Latest Fedora Updates:** The Fedora script now features modern Ptyxis-inspired styling, fixed keyboard shortcuts, and seamless GNOME integration. Your Terminator will look as clean and modern as Ptyxis while providing powerful split-pane functionality!
