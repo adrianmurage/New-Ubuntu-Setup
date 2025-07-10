@@ -281,7 +281,7 @@ cat > "$terminator_config_file" << 'EOF'
   title_inactive_fg_color = "#cccccc"
   title_inactive_bg_color = "#1a1a1a"
   window_state = maximise
-  handle_size = 3
+  handle_size = 1
   inactive_color_offset = 0.85
   tab_position = hidden
   close_button_on_tab = False
@@ -333,7 +333,7 @@ echo "🎨 Modern styling applied:"
 echo "   • Clean dark theme matching GNOME/Ptyxis design"
 echo "   • Minimal title bar for window dragging (but still clean)"
 echo "   • Hidden tabs and scrollbars for cleaner interface"
-echo "   • Pane borders visible in both light and dark system themes"
+echo "   • Ultra-thin 1px pane dividers (subtle but visible)"
 echo "   • Disabled all terminal bells for quiet operation"
 echo "   • Modern color palette with proper contrast"
 
